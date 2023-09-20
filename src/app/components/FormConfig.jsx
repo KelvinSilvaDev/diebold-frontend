@@ -3,7 +3,7 @@ import { useClientContext } from "../contexts/ClientContext";
 import { getSetting, createSetting, updateSetting } from "../services/api";
 import Modal from "react-modal";
 import { DatePickerComponent } from "./DatePicker";
-import { Form, Input, Select, Button, Col, Row } from "antd";
+import { Form, Input, Select, Button, Space, Col, Row } from "antd";
 import { CustomerSelector } from "./CustomerSelector";
 import moment from "moment";
 const { Option } = Select;
@@ -115,6 +115,9 @@ export const FormConfig = () => {
       setModalIsOpen(true);
     } else {
       console.log(form.getFieldsValue());
+      // createSetting(formData).then((response) => {
+      //   // Lógica após a criação (por exemplo, redirecionar)
+      // });
     }
   };
 
@@ -148,20 +151,23 @@ export const FormConfig = () => {
     };
 
     if (editMode) {
+      // console.log("UPDATE SETTING")
       updateSetting(JSON.stringify(requestData)).then((response) => {
         console.log(response);
-        setModalIsOpen(false);
+        closeModal();
         if (response.status === 200) {
           setEditMode(true);
           console.log(response.data.description);
         }
       });
     } else {
+      // console.log("CREATE SETTING")
       createSetting(JSON.stringify(requestData)).then((response) => {
         console.log(response);
-        setModalIsOpen(false);
+        closeModal();
         if (response.status === 200) {
           setEditMode(true);
+          // alert(response.data.description)
         }
       });
     }
@@ -211,7 +217,7 @@ export const FormConfig = () => {
     }
   };
 
-  const onFinish = (values) => {
+  const onFinish = () => {
     const lastCleaning = moment(form.getFieldValue("lastCleaning")).format(
       "YYYY-MM-DDTHH:mm:ss.SSSZ"
     );
@@ -224,6 +230,10 @@ export const FormConfig = () => {
       lastCleaning: lastCleaning,
       bdLastCleaning: bdLastCleaning,
     });
+
+   
+
+    openModal();
 
   };
 
