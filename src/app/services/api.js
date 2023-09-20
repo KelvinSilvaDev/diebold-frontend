@@ -36,9 +36,19 @@ const getSetting = async customerId => {
   }
 }
 
-const updateSetting = async (customerId, data) => {
+const updateSetting = async data => {
   try {
-    const response = await axios.put(`${API_URL}/setting?idCustomer=${customerId}`, data)
+    const response = await axios.put(`${API_URL}/setting`, data)
+    return response.data
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+const createSetting = async data => {
+  try {
+    console.log('data', data)
+    const response = await axios.post(`${API_URL}/setting`, data)
     return response.data
   } catch (error) {
     console.log(error)
@@ -83,4 +93,4 @@ const getCustomerIntegrations = async customerId => {
   }
 }
 
-export { getCustomers, getCustomerIntegrations, getSetting, updateSetting }
+export { getCustomers, getCustomerIntegrations, getSetting, updateSetting, createSetting }

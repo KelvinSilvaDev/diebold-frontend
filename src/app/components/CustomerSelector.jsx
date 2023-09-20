@@ -10,7 +10,7 @@ export function CustomerSelector() {
         customer.setSelectedClient(selectedCustomer);
       };
     return (
-        <>
+        <div className="flex items-center gap-4">
             <label
             htmlFor="clients"
             className="block text-gray-700 font-semibold mb-2"
@@ -29,6 +29,6 @@ export function CustomerSelector() {
                     </option>
                 ))}
             </select>
-        </>
+        </div>
     )
 }
