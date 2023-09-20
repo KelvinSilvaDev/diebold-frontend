@@ -154,19 +154,21 @@ export const FormConfig = () => {
       // console.log("UPDATE SETTING")
       updateSetting(JSON.stringify(requestData)).then((response) => {
         console.log(response);
+        setModalIsOpen(false);
         if (response.status === 200) {
           setEditMode(true);
           console.log(response.data.description);
-          closeModal();
+          // closeModal();
         }
       });
     } else {
       // console.log("CREATE SETTING")
       createSetting(JSON.stringify(requestData)).then((response) => {
         console.log(response);
+        setModalIsOpen(false);
         if (response.status === 200) {
           setEditMode(true);
-          closeModal();
+          // closeModal();
           // alert(response.data.description)
         }
       });
