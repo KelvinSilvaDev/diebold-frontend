@@ -27,6 +27,8 @@ const IntegrationTable = ({ integrations, getStatusText }) => {
       <table className="w-full mt-4 border rounded">
         <thead>
           <tr className=" text-black">
+            <th className="px-4 py-2 text-left">Data HR Inicio</th>
+            <th className="px-4 py-2 text-left">Data HR FIM</th>
             <th className="px-4 py-2 text-left">Status Download</th>
             <th className="px-4 py-2 text-left">Status Upload</th>
             <th className="px-4 py-2 text-center">Arquivos baixados</th>
@@ -42,6 +44,20 @@ const IntegrationTable = ({ integrations, getStatusText }) => {
               onClick={() => openModal(integration.integrationTasks)}
             >
               <td className="px-4 py-2">
+                {format(
+                  new Date(integration.dateTimeStart),
+                  "dd/MM/yyyy HH'h' mm'm' ss's'"
+                )}
+              </td>
+
+              <td className="px-4 py-2">
+                {format(
+                  new Date(integration.dateTimeEnd),
+                  "dd/MM/yyyy HH'h' mm'm' ss's'"
+                )}
+              </td>
+
+              <td className="px-4 py-2">
                 {getStatusText(integration.statusIntegration)}
               </td>
               <td className="px-4 py-2">
@@ -54,14 +70,10 @@ const IntegrationTable = ({ integrations, getStatusText }) => {
                   : "Desconhecido"}
               </td>
               <td className="px-4 py-2 text-center">
-                {integration.tasksIntegration?.length || 0}
+                {integration.quantityDownloadsInteg || 0}
               </td>
               <td className="px-4 py-2 text-center">
-                {
-                  integration.tasksIntegration?.filter(
-                    (task) => task.statusTask === 2 // O status 2 representa "Enviados com sucesso"
-                  ).length
-                }
+                {integration.quantityUploadsInteg || 0}
               </td>
               <td className="px-4 py-2 text-center">
                 {
