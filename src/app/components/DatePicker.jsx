@@ -25,7 +25,7 @@ export function DatePickerComponent({ value, onChange, disabled }) {
     onChange={handleDateChange}
     dateFormat="dd/MM/yyyy"
     disabled={disabled}
-    className="border rounded-md py-2 px-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+    className="border w-full border-gray-300 rounded-md py-1 px-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400"
     />
     
   );

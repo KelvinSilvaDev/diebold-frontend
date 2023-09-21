@@ -1,18 +1,23 @@
 'use client'
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
+import isEqual from 'lodash.isequal'
+
+import { useEffect, useState, useRef } from 'react'
 import { Inter } from 'next/font/google'
 import { format, formatDistance, formatRelative, subDays } from 'date-fns'
+import { setSelectedClient, setIntegrations } from './clientActions' // Certifique-se de que o caminho do arquivo está correto
 
 import DatePicker, { registerLocale, setDefaultLocale } from 'react-datepicker'
 import ptBR from 'date-fns/locale/pt-BR' // Importe o idioma desejado
+import { connect, useDispatch, useSelector } from 'react-redux'
 
 import 'react-datepicker/dist/react-datepicker.css'
 // import styles from "./page.module.css";
 import { useClientContext } from './contexts/ClientContext'
-import { CustomerSelector } from './components/CustomerSelector'
+import CustomerSelector from './components/CustomerSelector'
 import IntegrationTable from './components/IntegrationTable'
 import { getCustomers, getCustomerIntegrations } from './services/api'
+import { getIntegrationsForSelectedClient } from '@/redux/features/customerSlice'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -21,7 +26,7 @@ setDefaultLocale('pt-BR')
 
 export default function Home() {
   const [currentCustomer, setCurrentCustomer] = useState({})
-  const [integrations, setIntegrations] = useState([])
+  // const [integrations, setIntegrations] = useState([])
   const [selectedDateFilter, setSelectedDateFilter] = useState(null)
   const [startDate, setStartDate] = useState(null)
   const [endDate, setEndDate] = useState(null)
@@ -29,24 +34,79 @@ export default function Home() {
   const [erros, setErros] = useState(0)
   const [downloading, setDownloading] = useState(0)
   const [maquinasSemFR, setMaquinasSemFR] = useState(0)
+  const newIntegrations = useSelector(state => state.customers.integrations) // Nova integração
+  const [oldIntegrations, setOldIntegrations] = useState([])
+  const dispatch = useDispatch()
 
   const cliente = useClientContext()
 
-  useEffect(() => {
-    const fetchIntegrations = async customerId => {
-      try {
-        const fetchedIntegrations = await getCustomerIntegrations(customerId)
-        // 4 - Sobrescreve todo o cliente.selectedClient com as novas integrações
-        setCurrentCustomer(fetchedIntegrations)
-      } catch (error) {
-        console.error('Erro ao obter as integrações:', error)
-      }
-    }
+  // useEffect(() => {
+  //   const fetchIntegrations = async customerId => {
+  //     try {
+  //       const fetchedIntegrations = await getCustomerIntegrations(customerId)
+  //       // 4 - Sobrescreve todo o cliente.selectedClient com as novas integrações
+  //       setCurrentCustomer(fetchedIntegrations)
+  //     } catch (error) {
+  //       console.error('Erro ao obter as integrações:', error)
+  //     }
+  //   }
 
-    if (cliente.selectedClient && cliente.selectedClient.idCustomer) {
-      fetchIntegrations(cliente.selectedClient.idCustomer)
-    }
-  }, [cliente.selectedClient])
+  //   if (cliente.selectedClient && cliente.selectedClient.idCustomer) {
+  //     fetchIntegrations(cliente.selectedClient.idCustomer)
+  //   }
+  // }, [cliente.selectedClient])
+
+  // useEffect(() => {
+  //   const fetchCustomers = async () => {
+  //     try {
+  //       const customers = await getCustomers()
+
+  //       if (customers.length > 0) {
+  //         setSelectedClient(customers[0])
+  //       }
+
+  //       setCustomerList(customers)
+  //     } catch (error) {
+  //       console.log(error)
+  //     }
+  //   }
+
+  //   fetchCustomers()
+  // }, [])
+
+  // const [integrationData, setIntegrationData] = useState([])
+  // const integrationDataRef = useRef(integrationData)
+
+  // useEffect(() => {
+  //   const fetchDataInterval = setInterval(async () => {
+  //     // Realize a solicitação e obtenha os novos dados
+  //     const customerId = cliente.selectedClient?.idCustomer
+  //     if (customerId) {
+  //       try {
+  //         const newIntegrationData = await getCustomerIntegrations(customerId)
+
+  //         // Compare os novos dados com os dados anteriores usando isEqual
+  //         const hasDataChanged = !isEqual(newIntegrationData, integrationDataRef.current)
+
+  //         if (hasDataChanged) {
+  //           // Se os dados mudaram, atualize o estado
+  //           setIntegrationData(newIntegrationData)
+  //           integrationDataRef.current = newIntegrationData // Atualize a referência de dados
+  //         }
+  //       } catch (error) {
+  //         console.error('Erro ao obter as integrações:', error)
+  //       }
+  //     }
+  //   }, 3000)
+
+  //   return () => {
+  //     // Lembre-se de cancelar o intervalo quando o componente for desmontado
+  //     clearInterval(fetchDataInterval)
+  //   }
+  // }, [cliente.selectedClient])
+
+  const integrations = useSelector(state => state.customers.integrations) // Adicione esta linha para obter as integrações
+  const selectedClient = useSelector(state => state.customers.selectedClient)
 
   useEffect(() => {
     const fetchCustomers = async () => {
@@ -54,10 +114,8 @@ export default function Home() {
         const customers = await getCustomers()
 
         if (customers.length > 0) {
-          setSelectedClient(customers[0])
+          setSelectedClient(customers[0]) // Atualize o estado usando a ação Redux
         }
-
-        setCustomerList(customers)
       } catch (error) {
         console.log(error)
       }
@@ -65,6 +123,26 @@ export default function Home() {
 
     fetchCustomers()
   }, [])
+
+  useEffect(() => {
+    // Use setInterval para fazer a busca das integrações a cada 3 segundos
+    const intervalId = setInterval(() => {
+      if (selectedClient) {
+        dispatch(getIntegrationsForSelectedClient(selectedClient))
+      }
+    }, 3000)
+
+    // Lide com a limpeza do intervalo quando o componente for desmontado
+    return () => {
+      clearInterval(intervalId)
+    }
+  }, [selectedClient])
+
+  useEffect(() => {
+    if (JSON.stringify(oldIntegrations) !== JSON.stringify(newIntegrations)) {
+      setOldIntegrations(newIntegrations)
+    }
+  }, [newIntegrations])
 
   const calculateDownloading = tasksIntegration => {
     if (!tasksIntegration) return 0
@@ -107,12 +185,12 @@ export default function Home() {
   }
 
   const handleExportToExcel = () => {
-    if (currentCustomer.integrations.length === 0) {
+    if (integrations.length === 0) {
       console.error('Não há dados para exportar.')
       return
     }
 
-    if (!cliente.selectedClient) {
+    if (!selectedClient) {
       console.error('Cliente não selecionado. Não é possível exportar CSV.')
       return
     }
@@ -131,11 +209,11 @@ export default function Home() {
       // Adicione mais cabeçalhos aqui, se necessário
     ])
 
-    currentCustomer.integrations.forEach(integration => {
+    integrations.integrations.forEach(integration => {
       const { statusIntegration, statusUpload, tasksIntegration, dateTimeStart, dateTimeEnd } = integration
 
       const rowData = [
-        currentCustomer.customerName, // Nome do cliente
+        integrations.customerName, // Nome do cliente
         format(new Date(dateTimeStart), 'dd/MM/yyyy'), // Data de início
         format(new Date(dateTimeEnd), 'dd/MM/yyyy'), // Data de término
         getStatusText(statusIntegration),
@@ -158,7 +236,7 @@ export default function Home() {
       link.click()
     }
 
-    downloadCSV(csvData, `${currentCustomer.customerName} - ${format(new Date(), 'yyyy-MM-dd_HH-mm-ss')}`)
+    downloadCSV(csvData, `${integrations.customerName} - ${format(new Date(), 'yyyy-MM-dd_HH-mm-ss')}`)
   }
 
   const handleDateChange = (date, dateType) => {
@@ -224,54 +302,66 @@ export default function Home() {
     })
   }
 
-  const filteredIntegrations = filterIntegrationsByDate(currentCustomer.integrations, startDate, endDate)
+  // const currentCustomer = props.integrations
+
+  const filteredIntegrations = filterIntegrationsByDate(integrations.integrations, startDate, endDate)
   return (
     <main className="mx-auto flex flex-col flex-1  align-middle justify-center max-w-full w-ful">
       <div className="w-full h-full flex-1 flex-col flex">
         <div className="p-4 flex-1 ">
-          {cliente.selectedClient && (
-            <section className="bg-white rounded-md shadow-md p-8 mb-8">
-              <div className="flex items-center">
-                <div className="flex w-full">
-                  <h2 className="text-2xl font-semibold mb-4 flex gap-2">
-                    Status da Integração:{' '}
-                    <span className="text-sm font-semibold bg-slate-600 text-white p-2 rounded-xl">
-                      {currentCustomer.statusIntegrationCustomer}
-                    </span>
-                  </h2>
-                </div>
-                <div className="flex align-middle justify-end items-end w-full bg-white px-8 py-4">
-                  <ul className="flex align-middle justify-center items-center mb-0">
-                    <li className="flex align-middle justify-center items-center gap-4">
-                      <CustomerSelector />
-                    </li>
-                  </ul>
-                </div>
+          <section className="bg-white rounded-md shadow-md p-8 mb-8">
+            <div className="flex items-center">
+              <div className="flex w-full">
+                <h2 className="text-2xl font-semibold mb-4 flex gap-2">
+                  Status da Integração:{' '}
+                  <span className="text-sm font-semibold bg-slate-600 text-white p-2 rounded-xl">
+                    {integrations.statusIntegrationCustomer}
+                  </span>
+                </h2>
               </div>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="flex flex-col items-center bg-[#17a7ff] p-4">
-                  <p className="text-white font-semibold">Baixados</p>
-                  <p className="text-white text-3xl">{currentCustomer.quantityDownloadsCust}</p>
-                </div>
-                <div className="flex flex-col items-center bg-[#00b2a9] p-4">
-                  <p className="text-white font-semibold">Enviados</p>
-                  <p className="text-white text-3xl">{currentCustomer.quantityUploadsCust}</p>
-                </div>
-                <div className="flex flex-col items-center bg-[#004b87] p-4">
-                  <p className="text-white font-semibold">Baixados com Erro</p>
-                  <p className="text-white text-3xl">{currentCustomer.quantityDownloadError}</p>
-                </div>
-                <div className="flex flex-col items-center bg-[#007a87] p-4">
-                  <p className="text-white font-semibold">Enviados com Erro</p>
-                  <p className="text-white text-3xl">{currentCustomer.quantityUploadError}</p>
-                </div>
+              <div className="flex align-middle justify-end items-end w-full bg-white px-8 py-4">
+                <ul className="flex align-middle justify-center items-center mb-0">
+                  <li className="flex align-middle justify-center items-center gap-4">
+                    <CustomerSelector />
+                  </li>
+                </ul>
               </div>
-              <div className="flex flex-col items-center bg-[#808285] p-4">
-                <p className="text-white font-semibold">Máquinas sem FR maior que 10 dias</p>
-                <p className="text-white text-3xl">{currentCustomer.quantityHostsNoFr}</p>
+            </div>
+            <div className="flex items-center">
+              <div className="flex w-full">
+                <h2 className="text-2xl font-semibold mb-4 flex gap-2">
+                  Tempo da Integração:{' '}
+                  <span className="text-sm font-semibold bg-slate-600 text-white p-2 rounded-xl">
+                    {integrations.integrationTime}
+                  </span>
+                </h2>
               </div>
-            </section>
-          )}
+            </div>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="flex flex-col items-center bg-[#17a7ff] p-4">
+                <p className="text-white font-semibold">Baixados</p>
+                <p className="text-white text-3xl">{integrations.quantityDownloadsCust}</p>
+              </div>
+              <div className="flex flex-col items-center bg-[#00b2a9] p-4">
+                <p className="text-white font-semibold">Enviados</p>
+                <p className="text-white text-3xl">{integrations.quantityUploadsCust}</p>
+              </div>
+              <div className="flex flex-col items-center bg-[#004b87] p-4">
+                <p className="text-white font-semibold">Baixados com Erro</p>
+                <p className="text-white text-3xl">{integrations.quantityDownloadError}</p>
+              </div>
+              <div className="flex flex-col items-center bg-[#007a87] p-4">
+                <p className="text-white font-semibold">Enviados com Erro</p>
+                <p className="text-white text-3xl">{integrations.quantityUploadError}</p>
+              </div>
+            </div>
+            <div className="flex flex-col items-center bg-[#808285] p-4">
+              <p className="text-white font-semibold">Máquinas sem FR maior que 10 dias</p>
+              <p className="text-white text-3xl">{integrations.quantityHostsNoFr}</p>
+            </div>
+          </section>
+          {/* {selectedClient && (
+          )} */}
           <section>
             <div className="flex mb-4 w-full justify-between">
               <div className="flex w-full space-x-2 align-middle items-center">
@@ -322,3 +412,13 @@ export default function Home() {
     </main>
   )
 }
+// const mapStateToProps = state => ({
+//   // Mapeie outros estados aqui, se necessário
+// })
+
+// const mapDispatchToProps = {
+//   setSelectedClient,
+//   setIntegrations
+// }
+
+// export default connect(mapStateToProps, mapDispatchToProps)(Home)

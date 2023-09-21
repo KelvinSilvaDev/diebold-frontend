@@ -6,6 +6,7 @@ import { Sidebar } from './components/Sidebar'
 import { Footer } from './components/Footer'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import './globals.css'
+import { ReduxProvider } from '@/redux/provider'
 // import "bootstrap/dist/css/bootstrap.css";
 
 export const metadata = {
@@ -24,9 +25,11 @@ export default function RootLayout({ children }) {
     setIsOpen(prevstate => !prevstate)
   }
   return (
-    <AppProvider>
-      <html lang="pt-br">
-        <body id="app">
+    // <AppProvider>
+    // </AppProvider>
+    <html lang="pt-br">
+      <body id="app">
+        <ReduxProvider>
           <main className="flex w-full h-screen bg-gray-100">
             <aside className={`flex ${isOpen ? 'w-[220px]' : 'w-0'} h-screen bg-white transition-all duration-300`}>
               <div className="relative">
@@ -54,8 +57,8 @@ export default function RootLayout({ children }) {
               <Footer />
             </article>
           </main>
-        </body>
-      </html>
-    </AppProvider>
+        </ReduxProvider>
+      </body>
+    </html>
   )
 }

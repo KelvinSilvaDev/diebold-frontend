@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { useClientContext } from "../contexts/ClientContext";
+// import { useClientContext } from "../contexts/ClientContext";
 import { getSetting, createSetting, updateSetting } from "../services/api";
 import Modal from "react-modal";
 import { DatePickerComponent } from "./DatePicker";
 import { Form, Input, Select, Button, Space, Col, Row } from "antd";
-import { CustomerSelector } from "./CustomerSelector";
+import  CustomerSelector  from "./CustomerSelector";
 import moment from "moment";
+import { useDispatch, useSelector } from "react-redux";
 const { Option } = Select;
 
 export const FormConfig = () => {
-  const customer = useClientContext();
-  const selectedClient = customer.selectedClient.idCustomer;
+  // const customer = useClientContext();
+  // const selectedClient = customer.selectedClient.idCustomer;
+  const dispatch = useDispatch()
+  const selectedClient = useSelector(state => state.customers.selectedClient)
+
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [form] = Form.useForm();
@@ -419,11 +423,6 @@ export const FormConfig = () => {
             </Form.Item>
           </Col>
           <Col span={6}>
-            <Form.Item label="Limpeza a Cada" name="cleaningEvery">
-              <Input disabled={!formEnabled} />
-            </Form.Item>
-          </Col>
-          <Col span={6}>
             <Form.Item label="Data da Última Limpeza BD" name="bdLastCleaning">
               <DatePickerComponent
                 format="DD/MM/YYYY"
@@ -431,6 +430,11 @@ export const FormConfig = () => {
                 disabled={!formEnabled}
                 className="border-2 w-full rounded-md p-2 focus:outline-none focus:border-blue-500"
               />
+            </Form.Item>
+          </Col>
+          <Col span={6}>
+            <Form.Item label="Limpeza a Cada" name="cleaningEvery">
+              <Input disabled={!formEnabled} />
             </Form.Item>
           </Col>
           <Col span={6}>
