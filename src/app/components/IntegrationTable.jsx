@@ -1,10 +1,20 @@
 import { format } from "date-fns";
+import { get } from "mobx";
 import React, { useEffect } from "react";
 import Modal from "react-modal";
 
 const IntegrationTable = ({ integrations, getStatusText }) => {
   const [modalIsOpen, setModalIsOpen] = React.useState(false);
   const [selectedIntegration, setSelectedIntegration] = React.useState([]);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const itemsPerPage = 3;
+  
+  const getCurrentPageItems = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return integrationList.slice(startIndex, endIndex);
+  };
+  
 
   const openModal = (integration) => {
     setSelectedIntegration(integration);
@@ -37,10 +47,10 @@ const IntegrationTable = ({ integrations, getStatusText }) => {
           </tr>
         </thead>
         <tbody className="bg-white">
-          {integrationList.map((integration) => (
+          {getCurrentPageItems().map((integration) => (
             <tr
               key={integration.idIntegration}
-              className="border-b cursor-pointer"
+              className="border-b cursor-pointer hover:bg-cyan-100"
               onClick={() => openModal(integration.integrationTasks)}
             >
               <td className="px-4 py-2">
@@ -58,16 +68,10 @@ const IntegrationTable = ({ integrations, getStatusText }) => {
               </td>
 
               <td className="px-4 py-2">
-                {getStatusText(integration.statusIntegration)}
+              {getStatusText(integration.statusDownloads)}
               </td>
               <td className="px-4 py-2">
-                {integration.statusUpload === 0
-                  ? "Cancelado / Erro"
-                  : integration.statusUpload === 1
-                  ? "Em andamento"
-                  : integration.statusUpload === 2
-                  ? "Concluído"
-                  : "Desconhecido"}
+                {getStatusText(integration.statusUploads)}
               </td>
               <td className="px-4 py-2 text-center">
                 {integration.quantityDownloadsInteg || 0}
@@ -86,7 +90,27 @@ const IntegrationTable = ({ integrations, getStatusText }) => {
           ))}
         </tbody>
       </table>
-
+      <div className="pagination w-full flex gap-4 justify-end mt-2">
+        <button
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="hover:bg-cyan-100 cursor-pointer p-2 rounded-full"
+          >
+          Anterior
+        </button>
+        <span className="p-2">
+          Página {currentPage} de {Math.ceil(integrationList.length / itemsPerPage)}
+        </span>
+        <button
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={currentPage === Math.ceil(integrationList.length / itemsPerPage)}
+          className="hover:bg-cyan-100 cursor-pointer p-2 rounded-full"
+          
+          
+        >
+          Próxima
+        </button>
+      </div>
       {/* Modal */}
       <Modal
         isOpen={modalIsOpen}

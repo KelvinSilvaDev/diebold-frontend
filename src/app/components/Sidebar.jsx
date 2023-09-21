@@ -4,10 +4,10 @@ import { usePathname } from 'next/navigation'
 export function Sidebar() {
     const pathName = usePathname()
     return (
-        <nav className="flex flex-col bg-[#004b87]  max-w-[220px] min-h-screen h-full transition-all duration-300" role="navigation">
-            <div className='flex align-middle justify-center items-center w-[220px] h-[220px] pt-8 bg-gradient-to-r from-[#004b87] via-[#421062] to-[#a6192e] '>
+        <nav className="flex flex-col bg-[#004b87]  max-w-[320px] min-h-screen h-full transition-all duration-300" role="navigation">
+            <div className='flex align-middle justify-center items-center w-[320px] h-[220px] pt-8 bg-gradient-to-r from-[#004b87] via-[#421062] to-[#a6192e] '>
 
-                <Image id="imgLogo" src="/logo.png" width={50} height={50} alt="Diebold Nixdorf" />
+                <Image id="imgLogo" src="/logo.png" width={80} height={80} alt="Diebold Nixdorf" />
             </div>
             <div className="sidebar-collapse">
                 <ul className="" id="">

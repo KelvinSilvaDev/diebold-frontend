@@ -24,7 +24,7 @@ export default function AppLayout({ children }) {
   return (
     
           <main className="flex w-full h-screen bg-gray-100">
-            <aside className={`flex ${isOpen ? 'w-[220px]' : 'w-0'} h-screen bg-white transition-all duration-300`}>
+            <aside className={`flex ${isOpen ? 'w-[320px]' : 'w-0'} h-screen bg-white transition-all duration-300`}>
               <div className="relative">
                 {isOpen && <Sidebar />}
                 <button

@@ -151,11 +151,13 @@ export default function Home() {
 
   const getStatusText = statusIntegration => {
     if (statusIntegration === 2) {
-      return 'Finalizado'
+      return 'Conclúido'
     } else if (statusIntegration === 1) {
       return 'Em andamento'
     } else if (statusIntegration === 0) {
       return 'Erro/Cancelado'
+    } else if (statusIntegration === 3) {
+      return 'Parcial'
     } else {
       return 'Desconhecido'
     }
@@ -311,6 +313,7 @@ export default function Home() {
       <div className="w-full h-full flex-1 flex-col flex">
         <div className="p-4 flex-1 ">
           <section className="bg-white rounded-md shadow-md p-8 mb-8">
+            <h1 className="font-bold text-2xl text-center my-4">Integração Mais Recente</h1>
             <div className="flex items-center">
               <div className="flex w-full">
                 <h2 className="text-2xl font-semibold mb-4 flex gap-2">
@@ -366,28 +369,30 @@ export default function Home() {
           <section>
             <div className="flex mb-4 w-full justify-between">
               <div className="flex w-full space-x-2 align-middle items-center">
-                <DatePicker
-                  selected={startDate}
-                  onChange={date => handleDateChange(date, 'start')}
-                  selectsStart
-                  startDate={startDate}
-                  endDate={endDate}
-                  placeholderText="Data de início"
-                  dateFormat="dd/MM/yyyy"
-                  className="flex-1 border rounded-md py-2 px-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                />
-                <span className="flex items-center px-2 text-gray-800">até</span>
-                <DatePicker
-                  selected={endDate}
-                  onChange={date => handleDateChange(date, 'end')}
-                  selectsEnd
-                  startDate={startDate}
-                  endDate={endDate}
-                  minDate={startDate}
-                  placeholderText="Data de fim"
-                  dateFormat="dd/MM/yyyy"
-                  className="flex-1 border rounded-md py-2 px-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-                />
+                <div className="flex max-w-[500px] justify-start">
+                  <DatePicker
+                    selected={startDate}
+                    onChange={date => handleDateChange(date, 'start')}
+                    selectsStart
+                    startDate={startDate}
+                    endDate={endDate}
+                    placeholderText="Data de início"
+                    dateFormat="dd/MM/yyyy"
+                    className="flex-1 border rounded-md py-2 px-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  />
+                  <span className="flex items-center px-2 text-gray-800">até</span>
+                  <DatePicker
+                    selected={endDate}
+                    onChange={date => handleDateChange(date, 'end')}
+                    selectsEnd
+                    startDate={startDate}
+                    endDate={endDate}
+                    minDate={startDate}
+                    placeholderText="Data de fim"
+                    dateFormat="dd/MM/yyyy"
+                    className="flex-1 border rounded-md py-2 px-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  />
+                </div>
               </div>
               <button
                 className="flex-shrink-0  bg-[#004b87] hover:bg-[#0e3b61] text-white font-bold py-2 px-4 rounded"
