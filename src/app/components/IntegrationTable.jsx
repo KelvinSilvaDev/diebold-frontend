@@ -39,7 +39,7 @@ const IntegrationTable = ({ integrations, getStatusText }) => {
             <tr
               key={integration.idIntegration}
               className="border-b cursor-pointer"
-              onClick={() => openModal(integration.tasksIntegration)}
+              onClick={() => openModal(integration.integrationTasks)}
             >
               <td className="px-4 py-2">
                 {getStatusText(integration.statusIntegration)}
@@ -80,7 +80,7 @@ const IntegrationTable = ({ integrations, getStatusText }) => {
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
         contentLabel="Detalhes da Integração"
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border-none outline-none p-8 rounded-lg "
+        className="absolute max-h-[600px] overflow-y-scroll top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white border-none outline-none p-8 rounded-lg "
         overlayClassName="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50"
       >
         <h2 className="text-xl mb-4">Detalhes da Integração</h2>

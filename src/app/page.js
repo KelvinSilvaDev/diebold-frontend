@@ -305,6 +305,7 @@ export default function Home() {
   // const currentCustomer = props.integrations
 
   const filteredIntegrations = filterIntegrationsByDate(integrations.integrations, startDate, endDate)
+  console.log(filteredIntegrations)
   return (
     <main className="mx-auto flex flex-col flex-1  align-middle justify-center max-w-full w-ful">
       <div className="w-full h-full flex-1 flex-col flex">
