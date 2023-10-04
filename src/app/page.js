@@ -4,12 +4,12 @@ import isEqual from 'lodash.isequal'
 
 import { useEffect, useState, useRef } from 'react'
 import { Inter } from 'next/font/google'
-import { format, formatDistance, formatRelative, subDays } from 'date-fns'
-import { setSelectedClient, setIntegrations } from './clientActions' // Certifique-se de que o caminho do arquivo está correto
+import { format } from 'date-fns'
+
 
 import DatePicker, { registerLocale, setDefaultLocale } from 'react-datepicker'
 import ptBR from 'date-fns/locale/pt-BR' // Importe o idioma desejado
-import { connect, useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import 'react-datepicker/dist/react-datepicker.css'
 // import styles from "./page.module.css";
@@ -19,110 +19,26 @@ import IntegrationTable from './components/IntegrationTable'
 import { getCustomers, getCustomerIntegrations } from './services/api'
 import { getIntegrationsForSelectedClient } from '@/redux/features/customerSlice'
 
-const inter = Inter({ subsets: ['latin'] })
-
 registerLocale('pt-BR', ptBR) // Registre o idioma
 setDefaultLocale('pt-BR')
 
 export default function Home() {
   const [currentCustomer, setCurrentCustomer] = useState({})
-  // const [integrations, setIntegrations] = useState([])
-  const [selectedDateFilter, setSelectedDateFilter] = useState(null)
+  
   const [startDate, setStartDate] = useState(null)
   const [endDate, setEndDate] = useState(null)
-  const [enviados, setEnviados] = useState(0)
-  const [erros, setErros] = useState(0)
-  const [downloading, setDownloading] = useState(0)
-  const [maquinasSemFR, setMaquinasSemFR] = useState(0)
   const newIntegrations = useSelector(state => state.customers.integrations) // Nova integração
   const [oldIntegrations, setOldIntegrations] = useState([])
   const dispatch = useDispatch()
 
   const cliente = useClientContext()
 
-  // useEffect(() => {
-  //   const fetchIntegrations = async customerId => {
-  //     try {
-  //       const fetchedIntegrations = await getCustomerIntegrations(customerId)
-  //       // 4 - Sobrescreve todo o cliente.selectedClient com as novas integrações
-  //       setCurrentCustomer(fetchedIntegrations)
-  //     } catch (error) {
-  //       console.error('Erro ao obter as integrações:', error)
-  //     }
-  //   }
-
-  //   if (cliente.selectedClient && cliente.selectedClient.idCustomer) {
-  //     fetchIntegrations(cliente.selectedClient.idCustomer)
-  //   }
-  // }, [cliente.selectedClient])
-
-  // useEffect(() => {
-  //   const fetchCustomers = async () => {
-  //     try {
-  //       const customers = await getCustomers()
-
-  //       if (customers.length > 0) {
-  //         setSelectedClient(customers[0])
-  //       }
-
-  //       setCustomerList(customers)
-  //     } catch (error) {
-  //       console.log(error)
-  //     }
-  //   }
-
-  //   fetchCustomers()
-  // }, [])
-
-  // const [integrationData, setIntegrationData] = useState([])
-  // const integrationDataRef = useRef(integrationData)
-
-  // useEffect(() => {
-  //   const fetchDataInterval = setInterval(async () => {
-  //     // Realize a solicitação e obtenha os novos dados
-  //     const customerId = cliente.selectedClient?.idCustomer
-  //     if (customerId) {
-  //       try {
-  //         const newIntegrationData = await getCustomerIntegrations(customerId)
-
-  //         // Compare os novos dados com os dados anteriores usando isEqual
-  //         const hasDataChanged = !isEqual(newIntegrationData, integrationDataRef.current)
-
-  //         if (hasDataChanged) {
-  //           // Se os dados mudaram, atualize o estado
-  //           setIntegrationData(newIntegrationData)
-  //           integrationDataRef.current = newIntegrationData // Atualize a referência de dados
-  //         }
-  //       } catch (error) {
-  //         console.error('Erro ao obter as integrações:', error)
-  //       }
-  //     }
-  //   }, 3000)
-
-  //   return () => {
-  //     // Lembre-se de cancelar o intervalo quando o componente for desmontado
-  //     clearInterval(fetchDataInterval)
-  //   }
-  // }, [cliente.selectedClient])
+  
 
   const integrations = useSelector(state => state.customers.integrations) // Adicione esta linha para obter as integrações
   const selectedClient = useSelector(state => state.customers.selectedClient)
 
-  useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        const customers = await getCustomers()
-
-        if (customers.length > 0) {
-          setSelectedClient(customers[0]) // Atualize o estado usando a ação Redux
-        }
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    fetchCustomers()
-  }, [])
+  
 
   useEffect(() => {
     // Use setInterval para fazer a busca das integrações a cada 3 segundos
@@ -208,7 +124,7 @@ export default function Home() {
       'Arquivos baixados',
       'Enviados com sucesso',
       'Erros'
-      // Adicione mais cabeçalhos aqui, se necessário
+      
     ])
 
     integrations.integrations.forEach(integration => {
@@ -223,7 +139,7 @@ export default function Home() {
         tasksIntegration?.length || 0,
         calculateEnviados(tasksIntegration),
         calculateErros(tasksIntegration)
-        // Adicione mais dados das colunas aqui, se necessário
+        
       ]
       csvData.push(rowData)
     })
@@ -304,10 +220,11 @@ export default function Home() {
     })
   }
 
-  // const currentCustomer = props.integrations
+  
 
   const filteredIntegrations = filterIntegrationsByDate(integrations.integrations, startDate, endDate)
   console.log(filteredIntegrations)
+  console.log(integrations)
   return (
     <main className="mx-auto flex flex-col flex-1  align-middle justify-center max-w-full w-ful">
       <div className="w-full h-full flex-1 flex-col flex">
@@ -402,7 +319,7 @@ export default function Home() {
               </button>
             </div>
 
-            {currentCustomer?.integrations?.length === 0 ? (
+            {integrations.integrations?.length === 0 ? (
               <p className="text-red-500 mb-8">Não há integrações para o cliente selecionado.</p>
             ) : (
               <IntegrationTable
@@ -418,13 +335,3 @@ export default function Home() {
     </main>
   )
 }
-// const mapStateToProps = state => ({
-//   // Mapeie outros estados aqui, se necessário
-// })
-
-// const mapDispatchToProps = {
-//   setSelectedClient,
-//   setIntegrations
-// }
-
-// export default connect(mapStateToProps, mapDispatchToProps)(Home)
